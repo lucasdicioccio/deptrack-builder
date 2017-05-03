@@ -1,0 +1,16 @@
+resolver: lts-8.8
+packages:
+- '.'
+- location: '/home/user/deptrack-project/'
+  subdirs:
+    - deptrack-core
+    - deptrack-devops
+    - deptrack-devops-recipes
+  extra-dep: true
+extra-deps:
+- 'deptrack-devops-0.1.0.0'
+- 'deptrack-devops-recipes-0.1.0.0'
+- 'dotgen-0.4.2'
+- 'hdo-0.4'
+flags: {}
+extra-package-dbs: []
