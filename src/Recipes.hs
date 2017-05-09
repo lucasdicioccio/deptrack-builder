@@ -62,6 +62,21 @@ deptrackExample = stackInstall "/opt" deptrackProject
 
 --------------------------------------------------------------------
 
+-- | DepTrack-Builder self-hosting as a project.
+deptrackBuilderProject :: DevOp (StackProject "deptrack-builder")
+deptrackBuilderProject = fmap fst $ do
+    let url = "https://github.com/lucasdicioccio/deptrack-builder.git"
+    let branch = "master"
+    let systemDependencies = return () -- no system deps
+    stackProject url branch "deptrack-builder-src" (mereUser "root") `inject` systemDependencies
+
+instance HasBinary (StackProject "deptrack-builder") "deptrack-builder-exe" where
+
+deptrackBuilder :: DevOp (Binary "deptrack-builder-exe")
+deptrackBuilder = stackInstall "/opt" deptrackBuilderProject
+
+--------------------------------------------------------------------
+
 -- | Facebook's Duckling project.
 ducklingProject :: DevOp (StackProject "duckling")
 ducklingProject = fmap fst $ do
@@ -109,12 +124,14 @@ runDockerBuild cont img = do
 
 data BuildType =
     DepTrackProject
+  | DepTrackBuilder
   | Duckling
   | Postgrest
   deriving (Read, Show, Enum, Bounded)
 
 pickBuild :: BuildType -> DevOp Build
 pickBuild DepTrackProject = _deptrackBuild
+pickBuild DepTrackBuilder = _deptrackBuilderBuild
 pickBuild Duckling        = _ducklingBuild
 pickBuild Postgrest       = _postgrestBuild
 
@@ -125,6 +142,10 @@ _ducklingBuild =
 _deptrackBuild :: DevOp Build
 _deptrackBuild =
     Build "deptrack" "/opt/deptrack-devops-example-devtools" <$> (binaryPresent deptrackExample)
+
+_deptrackBuilderBuild :: DevOp Build
+_deptrackBuilderBuild =
+    Build "deptrack-builder" "/opt/deptrack-builder" <$> (binaryPresent deptrackBuilder)
 
 _postgrestBuild :: DevOp Build
 _postgrestBuild =
