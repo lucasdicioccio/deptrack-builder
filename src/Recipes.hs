@@ -120,6 +120,7 @@ runDockerBuild cont img = do
     let dir = fmap snd (dockerAuth name)
     let copySshKeys = insertDir dir "/root/.ssh"
     let artifact = dockerized (name <> "-build") img cont copySshKeys
+    fetchLogs (target <> ".logs") artifact
     fetchFile target ((fmap . fmap) _buildArtifact artifact)
 
 data BuildType =
